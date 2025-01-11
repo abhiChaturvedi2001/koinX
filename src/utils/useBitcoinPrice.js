@@ -12,6 +12,7 @@ const useBitcoinPrice = (coinId) => {
     useEffect(() => {
         const fetchData = async () => {
             const res = await axios.request(options);
+            // i am using this because of api too many request
             localStorage.setItem("coinData", JSON.stringify(res?.data));
             setData(res?.data);
         };

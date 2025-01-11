@@ -3,11 +3,15 @@ import React, { useEffect, useRef, memo } from "react";
 const TradingViewWidget = () => {
   const containerRef = useRef(null);
 
-  useEffect(() => {
-    // Cleanup existing widget if any
+  const setWidgetConfig = () => {
     if (containerRef.current) {
       containerRef.current.innerHTML = ""; // Clear the container content
     }
+
+    // Calculate width based on screen size
+    const screenWidth = window.innerWidth;
+    const widgetWidth =
+      screenWidth > 1024 ? 770 : screenWidth > 768 ? 600 : 400;
 
     // Create the script element
     const script = document.createElement("script");
@@ -17,7 +21,7 @@ const TradingViewWidget = () => {
     script.async = true;
     script.innerHTML = JSON.stringify({
       autosize: true,
-      width: "770",
+      width: widgetWidth,
       height: "450",
       symbol: "CRYPTOCAP:BTC",
       interval: "D",
@@ -36,8 +40,20 @@ const TradingViewWidget = () => {
 
     // Append the script to the container
     containerRef.current.appendChild(script);
+  };
+
+  useEffect(() => {
+    setWidgetConfig(); // Initial setup
+
+    // Add resize event listener to update widget size
+    const handleResize = () => {
+      setWidgetConfig();
+    };
+
+    window.addEventListener("resize", handleResize);
 
     return () => {
+      window.removeEventListener("resize", handleResize); // Cleanup event listener
       if (containerRef.current) {
         containerRef.current.innerHTML = ""; // Cleanup on unmount
       }
